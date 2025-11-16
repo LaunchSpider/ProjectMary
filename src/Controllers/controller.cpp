@@ -24,3 +24,29 @@ void Controller::addEntry(const QString &name,
 
     m_model.addEntry(e);
 }
+
+
+void Controller::updateEntry(int index,
+                             const QString &name,
+                             const QString &description,
+                             const QDateTime &deadline,
+                             const QString &statusStr)
+{
+    if (index < 0 || index >= m_model.rowCount())
+        return;
+
+    Entry &e = m_model.entryAt(index); // We'll add entryAt() in EntryListModel
+    e.entryName = name;
+    e.description = description;
+    e.deadline = deadline;
+
+    if (statusStr == "In progress")
+        e.state = Entry::State::InProgress;
+    else if (statusStr == "Completed")
+        e.state = Entry::State::Completed;
+    else
+        e.state = Entry::State::NotStarted;
+
+    QModelIndex modelIndex = m_model.index(index);
+    m_model.dataChanged(modelIndex, modelIndex);
+}

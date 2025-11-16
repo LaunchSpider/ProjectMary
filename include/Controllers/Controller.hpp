@@ -31,6 +31,13 @@ public:
                               const QDateTime &deadline,
                               const QString &statusStr);
 
+    Q_INVOKABLE void updateEntry(int index,
+                                 const QString &name,
+                                 const QString &description,
+                                 const QDateTime &deadline,
+                                 const QString &statusStr);
+
+
 private:
     EntryListModel m_model;
 };

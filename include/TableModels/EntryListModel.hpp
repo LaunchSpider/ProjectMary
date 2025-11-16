@@ -29,6 +29,9 @@ public:
 
     void addEntry(const Entry &entry);
 
+    Entry &entryAt(int row) { return m_entries[row]; }
+
+
 private:
     EntryVector m_entries;
 };
