@@ -37,7 +37,6 @@ public:
                                  const QDateTime &deadline,
                                  const QString &statusStr);
 
-
 private:
     EntryListModel m_model;
 };

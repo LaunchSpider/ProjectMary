@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import ProjectMary 1.0
 
-Window {
+ApplicationWindow{
     id: root
     width: 900
     height: 600
@@ -33,20 +33,25 @@ Window {
             Layout.fillHeight: true
             spacing: 0
 
-            // LEFT LIST
+            // LEFT LIST — now 60% width
             TasksList {
                 id: tasksList
                 model: Controller.entryModel
                 Layout.fillHeight: true
-                Layout.preferredWidth: 300
-                Layout.minimumWidth: 200
+
+                Layout.preferredWidth: 0.6 * root.width
+                Layout.minimumWidth: 250
             }
 
-            // RIGHT SLIDING PANEL
+            // RIGHT SLIDING PANEL — now 40% width
             TaskDetailPanel {
                 id: detailPanel
                 tasksList: tasksList
                 slideDuration: root.slideDuration
+
+                Layout.fillHeight: true
+                Layout.preferredWidth: 0.4 * root.width
+
                 onCloseRequested: tasksList.currentIndex = -1
             }
         }

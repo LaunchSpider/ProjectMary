@@ -31,7 +31,6 @@ public:
 
     Entry &entryAt(int row) { return m_entries[row]; }
 
-
 private:
     EntryVector m_entries;
 };

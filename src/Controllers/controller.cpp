@@ -25,7 +25,6 @@ void Controller::addEntry(const QString &name,
     m_model.addEntry(e);
 }
 
-
 void Controller::updateEntry(int index,
                              const QString &name,
                              const QString &description,
@@ -35,7 +34,7 @@ void Controller::updateEntry(int index,
     if (index < 0 || index >= m_model.rowCount())
         return;
 
-    Entry &e = m_model.entryAt(index); // We'll add entryAt() in EntryListModel
+    Entry &e = m_model.entryAt(index);
     e.entryName = name;
     e.description = description;
     e.deadline = deadline;

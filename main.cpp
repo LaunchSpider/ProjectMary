@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
-    // Matches URI in CMake and Main.qml
     engine.loadFromModule("ProjectMary", "Main");
 
     return app.exec();
