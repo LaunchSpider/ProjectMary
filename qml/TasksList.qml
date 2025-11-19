@@ -26,10 +26,56 @@ ListView {
             anchors.fill: parent
             anchors.margins: 4
 
-            Text { text: name; Layout.preferredWidth: 120; elide: Text.ElideRight }
-            Text { text: deadline; Layout.preferredWidth: 100; elide: Text.ElideRight }
-            Text { text: description; Layout.fillWidth: true; elide: Text.ElideRight }
-            Text { text: status; Layout.preferredWidth: 90; elide: Text.ElideRight }
+            // Name column
+            Text {
+                text: name
+                Layout.preferredWidth: parent.width * 0.6   // wide column
+                elide: Text.ElideRight
+            }
+
+            // Deadline centered
+            Text {
+                text: {
+                    const nowMs = Date.now();
+                    const deadlineMs = deadline.getTime();
+                    const diffMs = deadlineMs - nowMs;
+
+                    if (diffMs <= 0) {
+                        return "Expired";
+                    }
+
+                    const msPerDay = 1000 * 60 * 60 * 24;
+                    const msPerHour = 1000 * 60 * 60;
+
+                    const diffDays = diffMs / msPerDay;
+
+                    // Show hours if less than 1 day
+                    if (diffDays < 1) {
+                        const hours = Math.ceil(diffMs / msPerHour);
+                        return hours + " hours";
+                    }
+
+                    // Otherwise show days
+                    return Math.ceil(diffDays) + " days";
+                }
+
+                Layout.preferredWidth: parent.width * 0.2
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            // Status centered
+            Text {
+                text: status
+                Layout.preferredWidth: parent.width * 0.2
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
         }
     }
 }
+
+
+            //Text { text: description; Layout.fillWidth: true; elide: Text.ElideRight }

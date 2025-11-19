@@ -88,6 +88,14 @@ Item {
             ComboBox { id: editMinute; model: [0,15,30,45] }
         }
 
+        // DEADLINE (view mode)
+        Label {
+            visible: !editMode && tasksList.currentItem
+            text: tasksList.currentItem
+                ? "Deadline: " + Qt.formatDateTime(tasksList.currentItem.d_deadline, "dd MMM yyyy hh:mm")
+                : ""
+        }
+
         // STATUS
         Label {
             text: !editMode && tasksList.currentItem
