@@ -27,10 +27,16 @@ public:
 
     Q_INVOKABLE int rowCountQml() const { return rowCount(); }
 
+    Q_INVOKABLE void sortByDeadline();
+    Q_INVOKABLE void toggleSortOrder();
+    Q_INVOKABLE bool sortAscending() const { return m_sortAscending; }
+
     void addEntry(const Entry &entry);
 
     Entry &entryAt(int row) { return m_entries[row]; }
 
 private:
     EntryVector m_entries;
+
+    bool m_sortAscending = true;
 };

@@ -40,6 +40,9 @@ public:
     Q_INVOKABLE void saveEntries(const QString &filename);
     Q_INVOKABLE void loadEntries(const QString &filename);
 
+    Q_INVOKABLE void toggleSortOrder() { m_model.toggleSortOrder(); }
+    Q_INVOKABLE bool sortAscending() const { return m_model.sortAscending(); }
+
 private:
     EntryListModel m_model;
 };

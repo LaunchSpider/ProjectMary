@@ -38,6 +38,27 @@ ApplicationWindow{
             Item { Layout.fillWidth: true }
         }
 
+        // LAYOUT WITH TABLE SORTING
+        RowLayout {
+            Layout.preferredWidth: 0.6 * root.width
+            spacing: 6
+
+            Item { Layout.preferredWidth: 0.575 * root.width } // plugger to move the button to the right of the row
+
+            Button {
+                id: sortBtn
+                text: Controller.entryModel.sortAscending() ? "⇊" : "⇈"
+                font.pixelSize: 15
+                Layout.preferredWidth: width
+                Layout.preferredHeight: height
+
+                onClicked: {
+                    Controller.toggleSortOrder()
+                    sortBtn.text = Controller.entryModel.sortAscending() ? "⇊" : "⇈"
+                }
+            }
+        }
+
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true

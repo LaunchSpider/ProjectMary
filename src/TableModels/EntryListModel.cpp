@@ -1,5 +1,7 @@
 #include "EntryListModel.hpp"
 
+#include <algorithm>
+
 EntryListModel::EntryListModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -54,3 +56,27 @@ void EntryListModel::addEntry(const Entry &entry)
     m_entries.push_back(entry);
     endInsertRows();
 }
+
+void EntryListModel::sortByDeadline()
+{
+    beginResetModel();
+    if (m_sortAscending) {
+        std::sort(m_entries.begin(), m_entries.end(),
+                  [](const Entry &a, const Entry &b) {
+                      return a.deadline < b.deadline;
+                  });
+    } else {
+        std::sort(m_entries.begin(), m_entries.end(),
+                  [](const Entry &a, const Entry &b) {
+                      return a.deadline > b.deadline;
+                  });
+    }
+    endResetModel();
+}
+
+void EntryListModel::toggleSortOrder()
+{
+    m_sortAscending = !m_sortAscending;
+    sortByDeadline();
+}
+
