@@ -11,6 +11,16 @@ ApplicationWindow{
 
     property int slideDuration: 200
 
+    Component.onCompleted: {
+            // Load previously saved entries when the app starts
+            Controller.loadEntries("entries.csv")
+        }
+
+    onClosing: {
+            // Call your save method before the app closes
+            Controller.saveEntries("entries.csv")
+        }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0

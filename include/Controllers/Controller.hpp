@@ -37,6 +37,9 @@ public:
                                  const QDateTime &deadline,
                                  const QString &statusStr);
 
+    Q_INVOKABLE void saveEntries(const QString &filename);
+    Q_INVOKABLE void loadEntries(const QString &filename);
+
 private:
     EntryListModel m_model;
 };
