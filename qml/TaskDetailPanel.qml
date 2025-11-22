@@ -126,6 +126,24 @@ Item {
             }
         }
 
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Item { Layout.fillWidth: true }
+
+            Button {
+                visible: !editMode && modelData
+                text: "Delete"
+                onClicked: {
+                    if (tasksList && tasksList.currentIndex >= 0) {
+                        Controller.removeEntry(tasksList.currentIndex)
+                        closeRequested()
+                    }
+                }
+            }
+        }
+
         Button {
             visible: editMode
             text: "Save"

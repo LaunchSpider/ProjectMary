@@ -42,6 +42,8 @@ public:
 
     Q_INVOKABLE void sortBy(const QString &roleName) { m_model.sortBy(roleName); }
 
+    Q_INVOKABLE void removeEntry(int index) { m_model.removeEntry(index); }
+
 private:
     EntryListModel m_model;
 };

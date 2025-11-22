@@ -81,3 +81,12 @@ void EntryListModel::sortBy(const QString &roleName)
     endResetModel();
 }
 
+void EntryListModel::removeEntry(int index) {
+    if (index < 0 || index >= m_entries.size())
+        return;
+    beginRemoveRows(QModelIndex(), index, index);
+    m_entries.erase(m_entries.begin() + index);
+    endRemoveRows();
+}
+
+

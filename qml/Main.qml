@@ -5,8 +5,8 @@ import ProjectMary 1.0
 
 ApplicationWindow{
     id: root
-    width: 900
-    height: 600
+    width: 1280
+    height: 720
     visible: true
 
     property int slideDuration: 200
@@ -35,17 +35,7 @@ ApplicationWindow{
             Layout.fillHeight: true
             spacing: 10
 
-            Item { Layout.fillWidth: true; Layout.preferredHeight: 15 }
-
-            Text {
-                text: "📅"
-                font.pointSize: 18
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.fillWidth: true
-            }
-
-            Item { Layout.fillWidth: true; Layout.preferredHeight: 20 } // Spacer
+            Item { Layout.fillWidth: true; Layout.preferredHeight: 90 } // Spacer
 
             ColumnLayout {
                 id: buttonColumn

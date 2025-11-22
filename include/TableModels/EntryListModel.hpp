@@ -50,6 +50,8 @@ public:
         return m;
     }
 
+    Q_INVOKABLE void removeEntry(int index);
+
     void addEntry(const Entry &entry);
     Entry &entryAt(int row) { return m_entries[row]; }
 
