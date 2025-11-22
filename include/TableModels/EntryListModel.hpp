@@ -29,12 +29,31 @@ public:
 
     Q_INVOKABLE void sortBy(const QString &roleName);
 
-    void addEntry(const Entry &entry);
+    Q_INVOKABLE QVariantMap get(int row) const {
+        QVariantMap m;
+        if (row < 0 || row >= m_entries.size())
+            return m;
 
+        const Entry &e = m_entries[row];
+        m["name"] = e.entryName;
+        m["description"] = e.description;
+        m["deadline"] = e.deadline;
+
+        QString status;
+        switch (e.state) {
+        case Entry::State::NotStarted: status = "Not started"; break;
+        case Entry::State::InProgress: status = "In progress"; break;
+        case Entry::State::Completed: status = "Completed"; break;
+        }
+        m["status"] = status;
+
+        return m;
+    }
+
+    void addEntry(const Entry &entry);
     Entry &entryAt(int row) { return m_entries[row]; }
 
 private:
     EntryVector m_entries;
-
     bool m_sortAscending = true;
 };
