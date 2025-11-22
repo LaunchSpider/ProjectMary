@@ -44,6 +44,10 @@ public:
 
     Q_INVOKABLE void removeEntry(int index) { m_model.removeEntry(index); }
 
+    Q_INVOKABLE void setSearchFilter(const QString &text) {
+        m_model.setFilter(text);
+    }
+
 private:
     EntryListModel m_model;
 };

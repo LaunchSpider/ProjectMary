@@ -52,10 +52,21 @@ public:
 
     Q_INVOKABLE void removeEntry(int index);
 
+    Q_INVOKABLE void setFilter(const QString &filterText);
+
     void addEntry(const Entry &entry);
     Entry &entryAt(int row) { return m_entries[row]; }
+
+    const EntryVector& allEntries() const { return m_allEntries; }
+    void setAllEntries(const EntryVector& entries) {
+        m_allEntries = entries;
+        setFilter(m_filter);
+    }
 
 private:
     EntryVector m_entries;
     bool m_sortAscending = true;
+
+    QString m_filter;
+    EntryVector m_allEntries;
 };

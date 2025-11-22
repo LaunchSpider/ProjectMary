@@ -62,11 +62,10 @@ void Controller::saveEntries(const QString &filename)
         return;
 
     QTextStream out(&file);
-    // Write header
     out << "Name,Description,Deadline,Status\n";
 
-    for (int i = 0; i < m_model.rowCount(); ++i) {
-        const Entry &e = m_model.entryAt(i);
+    const EntryVector &all = m_model.allEntries();
+    for (const Entry &e : all) {
         QString statusStr;
         switch (e.state) {
         case Entry::State::NotStarted: statusStr = "Not started"; break;
@@ -78,19 +77,22 @@ void Controller::saveEntries(const QString &filename)
             << e.deadline.toString() << ","
             << statusStr << "\n";
     }
-    file.close();
 }
+
 
 void Controller::loadEntries(const QString &filename)
 {
+    EntryVector entries;
+
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
     QTextStream in(&file);
-    QString line = in.readLine(); // Skip header
+    in.readLine(); // skip header
+
     while (!in.atEnd()) {
-        line = in.readLine();
+        QString line = in.readLine();
         QStringList fields = line.split(',');
         if (fields.size() != 4)
             continue;
@@ -108,8 +110,11 @@ void Controller::loadEntries(const QString &filename)
         else
             e.state = Entry::State::NotStarted;
 
-        m_model.addEntry(e);
+        entries.push_back(e);
     }
-    file.close();
+
+    m_model.setAllEntries(entries); // replace full list and rebuild filtered view
 }
+
+
 

@@ -51,34 +51,57 @@ QHash<int,QByteArray> EntryListModel::roleNames() const
 
 void EntryListModel::addEntry(const Entry &entry)
 {
-    const int newRow = rowCount();
-    beginInsertRows(QModelIndex(), newRow, newRow);
-    m_entries.push_back(entry);
-    endInsertRows();
+    m_allEntries.push_back(entry);
+    setFilter(m_filter); // rebuilds m_entries
+}
+
+void EntryListModel::setFilter(const QString &filterText)
+{
+    beginResetModel();
+    m_filter = filterText.trimmed();
+
+    m_entries.clear();
+
+    if (m_filter.isEmpty()) {
+        m_entries = m_allEntries;
+    } else {
+        for (const Entry &e : m_allEntries) {
+            if (e.entryName.contains(m_filter, Qt::CaseInsensitive))
+                m_entries.push_back(e);
+        }
+    }
+
+    endResetModel();
 }
 
 void EntryListModel::sortBy(const QString &roleName)
 {
-    beginResetModel();
     if (roleName == "name") {
-        if (m_sortAscending)
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.entryName < b.entryName; });
-        else
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.entryName > b.entryName; });
-    } else if (roleName == "deadline") {
-        if (m_sortAscending)
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.deadline < b.deadline; });
-        else
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.deadline > b.deadline; });
-    } else if (roleName == "status") {
-        if (m_sortAscending)
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.state < b.state; });
-        else
-            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.state > b.state; });
+        std::sort(m_allEntries.begin(), m_allEntries.end(),
+                  [&](const Entry &a, const Entry &b){
+                      return m_sortAscending ? a.entryName < b.entryName
+                                             : a.entryName > b.entryName;
+                  });
     }
-    // flip order for next sort unless it's a repeated header click
+    else if (roleName == "deadline") {
+        std::sort(m_allEntries.begin(), m_allEntries.end(),
+                  [&](const Entry &a, const Entry &b){
+                      return m_sortAscending ? a.deadline < b.deadline
+                                             : a.deadline > b.deadline;
+                  });
+    }
+    else if (roleName == "status") {
+        std::sort(m_allEntries.begin(), m_allEntries.end(),
+                  [&](const Entry &a, const Entry &b){
+                      return m_sortAscending ? a.state < b.state
+                                             : a.state > b.state;
+                  });
+    }
+
     m_sortAscending = !m_sortAscending;
-    endResetModel();
+
+    // recreate filtered list
+    setFilter(m_filter);
 }
 
 void EntryListModel::removeEntry(int index) {

@@ -98,6 +98,13 @@ ApplicationWindow{
                 Layout.fillWidth: true
                 spacing: 6
 
+                TextField {
+                    id: searchField
+                    placeholderText: "Search tasks…"
+                    Layout.preferredWidth: 200
+                    onTextChanged: Controller.setSearchFilter(text)
+                }
+
                 Button {
                     text: "Add Task"
                     onClicked: addTaskDialog.open()
