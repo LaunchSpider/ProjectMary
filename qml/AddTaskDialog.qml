@@ -52,6 +52,7 @@ Dialog {
 
         TextArea {
             id: descriptionField
+            placeholderText: "Description"
             Layout.fillWidth: true
             Layout.preferredHeight: 60
         }

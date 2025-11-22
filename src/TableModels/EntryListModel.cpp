@@ -57,26 +57,27 @@ void EntryListModel::addEntry(const Entry &entry)
     endInsertRows();
 }
 
-void EntryListModel::sortByDeadline()
+void EntryListModel::sortBy(const QString &roleName)
 {
     beginResetModel();
-    if (m_sortAscending) {
-        std::sort(m_entries.begin(), m_entries.end(),
-                  [](const Entry &a, const Entry &b) {
-                      return a.deadline < b.deadline;
-                  });
-    } else {
-        std::sort(m_entries.begin(), m_entries.end(),
-                  [](const Entry &a, const Entry &b) {
-                      return a.deadline > b.deadline;
-                  });
+    if (roleName == "name") {
+        if (m_sortAscending)
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.entryName < b.entryName; });
+        else
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.entryName > b.entryName; });
+    } else if (roleName == "deadline") {
+        if (m_sortAscending)
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.deadline < b.deadline; });
+        else
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.deadline > b.deadline; });
+    } else if (roleName == "status") {
+        if (m_sortAscending)
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.state < b.state; });
+        else
+            std::sort(m_entries.begin(), m_entries.end(), [](const Entry &a, const Entry &b){ return a.state > b.state; });
     }
-    endResetModel();
-}
-
-void EntryListModel::toggleSortOrder()
-{
+    // flip order for next sort unless it's a repeated header click
     m_sortAscending = !m_sortAscending;
-    sortByDeadline();
+    endResetModel();
 }
 

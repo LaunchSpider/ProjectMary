@@ -27,7 +27,6 @@ void Controller::addEntry(const QString &name,
         e.state = Entry::State::NotStarted;
 
     m_model.addEntry(e);
-    m_model.sortByDeadline();
 }
 
 void Controller::updateEntry(int index,
@@ -54,7 +53,6 @@ void Controller::updateEntry(int index,
     QModelIndex modelIndex = m_model.index(index);
     m_model.dataChanged(modelIndex, modelIndex);
 
-    m_model.sortByDeadline();
 }
 
 void Controller::saveEntries(const QString &filename)
@@ -113,6 +111,5 @@ void Controller::loadEntries(const QString &filename)
         m_model.addEntry(e);
     }
     file.close();
-    m_model.sortByDeadline();
 }
 

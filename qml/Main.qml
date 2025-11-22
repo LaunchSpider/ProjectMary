@@ -11,79 +11,167 @@ ApplicationWindow{
 
     property int slideDuration: 200
 
+    property string currentView: "All"
+
     Component.onCompleted: {
-            // Load previously saved entries when the app starts
-            Controller.loadEntries("entries.csv")
-        }
+        // Load previously saved entries when the app starts
+        Controller.loadEntries("entries.csv")
+    }
 
     onClosing: {
-            // Call your save method before the app closes
-            Controller.saveEntries("entries.csv")
-        }
+        // Call your save method before the app closes
+        Controller.saveEntries("entries.csv")
+    }
 
-    ColumnLayout {
+    // OUTER ROWLAYOUT: LEFT COLUMN + MAIN CONTENT
+    RowLayout {
         anchors.fill: parent
         spacing: 0
 
-        // TOP BAR WITH "ADD TASK"
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 6
+        // LEFT COLUMN (10%)
+        ColumnLayout {
+            id: leftPanel
+            Layout.preferredWidth: 0.10 * root.width
+            Layout.fillHeight: true
+            spacing: 10
 
-            Button {
-                text: "Add Task"
-                onClicked: addTaskDialog.open()
+            Item { Layout.fillWidth: true; Layout.preferredHeight: 15 }
+
+            Text {
+                text: "📅"
+                font.pointSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillWidth: true
             }
 
-            Item { Layout.fillWidth: true }
-        }
+            Item { Layout.fillWidth: true; Layout.preferredHeight: 20 } // Spacer
 
-        // LAYOUT WITH TABLE SORTING
-        RowLayout {
-            Layout.preferredWidth: 0.6 * root.width
-            spacing: 6
+            ColumnLayout {
+                id: buttonColumn
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                spacing: 12
 
-            Item { Layout.preferredWidth: 0.575 * root.width } // plugger to move the button to the right of the row
-
-            Button {
-                id: sortBtn
-                text: Controller.entryModel.sortAscending() ? "⇊" : "⇈"
-                font.pixelSize: 15
-                Layout.preferredWidth: width
-                Layout.preferredHeight: height
-
-                onClicked: {
-                    Controller.toggleSortOrder()
-                    sortBtn.text = Controller.entryModel.sortAscending() ? "⇊" : "⇈"
+                Button {
+                    id: allButton
+                    text: "All"
+                    Layout.preferredWidth: 0.6 * leftPanel.width
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: currentView = "All"
+                }
+                Button {
+                    id: weekButton
+                    text: "Week"
+                    Layout.preferredWidth: 0.6 * leftPanel.width
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: currentView = "Week"
+                }
+                Button {
+                    id: monthButton
+                    text: "Month"
+                    Layout.preferredWidth: 0.6 * leftPanel.width
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: currentView = "Month"
                 }
             }
+
+            Item { Layout.fillHeight: true }
         }
 
-        RowLayout {
-            Layout.fillWidth: true
+
+        // MAIN CONTENT (85%) — your previous layout
+        ColumnLayout {
+            Layout.preferredWidth: 0.90 * root.width
             Layout.fillHeight: true
             spacing: 0
 
-            // LEFT LIST — now 60% width
-            TasksList {
-                id: tasksList
-                model: Controller.entryModel
-                Layout.fillHeight: true
+            Item { Layout.fillWidth: true; Layout.preferredHeight: 15 }
 
-                Layout.preferredWidth: 0.6 * root.width
-                Layout.minimumWidth: 250
+            // TOP BAR SECTION NAME"
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 6
+
+                Text {
+                    text: currentView
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    Layout.fillWidth: true
+                }
+
+                Item { Layout.fillWidth: true }
             }
 
-            // RIGHT SLIDING PANEL — now 40% width
-            TaskDetailPanel {
-                id: detailPanel
-                tasksList: tasksList
-                slideDuration: root.slideDuration
+            // MIDDLE BAR WITH "ADD TASK"
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 6
 
+                Button {
+                    text: "Add Task"
+                    onClicked: addTaskDialog.open()
+                }
+
+                Item { Layout.fillWidth: true }
+            }
+
+            // TWO-PANEL INTERFACE
+            RowLayout {
+                Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: 0.4 * root.width
+                spacing: 0
 
-                onCloseRequested: tasksList.currentIndex = -1
+                // TASK TABLE
+                ColumnLayout {
+                    id: tableColumn
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 0.7 * root.width
+                    Layout.minimumWidth: 250
+
+                    // HEADER ROW
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+
+                        ToolButton {
+                            text: "Name"
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 6
+                            onClicked: Controller.sortBy("name")
+                        }
+                        ToolButton {
+                            text: "Deadline"
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 2
+                            onClicked: Controller.sortBy("deadline")
+                        }
+                        ToolButton {
+                            text: "Status"
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 2
+                            onClicked: Controller.sortBy("status")
+                        }
+                    }
+
+                    // TABLE/LIST
+                    TasksList {
+                        id: tasksList
+                        model: Controller.entryModel
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                    }
+                }
+
+                // TASK DETAILS PANEL
+                TaskDetailPanel {
+                    id: detailPanel
+                    tasksList: tasksList
+                    slideDuration: root.slideDuration
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 0.3 * root.width
+                    onCloseRequested: tasksList.currentIndex = -1
+                }
             }
         }
     }

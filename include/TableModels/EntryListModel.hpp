@@ -27,9 +27,7 @@ public:
 
     Q_INVOKABLE int rowCountQml() const { return rowCount(); }
 
-    Q_INVOKABLE void sortByDeadline();
-    Q_INVOKABLE void toggleSortOrder();
-    Q_INVOKABLE bool sortAscending() const { return m_sortAscending; }
+    Q_INVOKABLE void sortBy(const QString &roleName);
 
     void addEntry(const Entry &entry);
 
