@@ -20,10 +20,11 @@ Item {
 
     visible: tasksList && tasksList.currentIndex >= 0
 
-    // NEW: Always fetch correct row data from model
     property var modelData: tasksList && tasksList.currentIndex >= 0
         ? tasksList.model.get(tasksList.currentIndex)
         : null
+
+    property string currentEntryId: modelData ? modelData.id : ""
 
     ColumnLayout {
         anchors.fill: parent
@@ -68,7 +69,10 @@ Item {
             Button {
                 visible: modelData !== null
                 text: "Close"
-                onClicked: { editMode = false; closeRequested() }
+                onClicked: {
+                    editMode = false
+                    closeRequested()
+                }
             }
         }
 
@@ -136,8 +140,8 @@ Item {
                 visible: !editMode && modelData
                 text: "Delete"
                 onClicked: {
-                    if (tasksList && tasksList.currentIndex >= 0) {
-                        Controller.removeEntry(tasksList.currentIndex)
+                    if (currentEntryId) {
+                        Controller.removeEntryById(currentEntryId)
                         closeRequested()
                     }
                 }
@@ -148,7 +152,7 @@ Item {
             visible: editMode
             text: "Save"
             onClicked: {
-                if (!modelData) return;
+                if (!currentEntryId) return;
 
                 var deadline = new Date(
                     editYear.currentText,
@@ -158,8 +162,8 @@ Item {
                     editMinute.currentText
                 )
 
-                Controller.updateEntry(
-                    tasksList.currentIndex,
+                Controller.updateEntryById(
+                    currentEntryId,
                     nameEditor.text,
                     descriptionEditor.text,
                     deadline,

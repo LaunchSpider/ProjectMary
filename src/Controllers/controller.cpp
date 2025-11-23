@@ -29,30 +29,30 @@ void Controller::addEntry(const QString &name,
     m_model.addEntry(e);
 }
 
-void Controller::updateEntry(int index,
-                             const QString &name,
-                             const QString &description,
-                             const QDateTime &deadline,
-                             const QString &statusStr)
+void Controller::updateEntryById(const QString &idStr,
+                                 const QString &name,
+                                 const QString &description,
+                                 const QDateTime &deadline,
+                                 const QString &statusStr)
 {
-    if (index < 0 || index >= m_model.rowCount())
+    QUuid id = QUuid::fromString(idStr);
+    Entry *e = m_model.findEntryById(id);
+
+    if (!e)
         return;
 
-    Entry &e = m_model.entryAt(index);
-    e.entryName = name;
-    e.description = description;
-    e.deadline = deadline;
+    e->entryName = name;
+    e->description = description;
+    e->deadline = deadline;
 
     if (statusStr == "In progress")
-        e.state = Entry::State::InProgress;
+        e->state = Entry::State::InProgress;
     else if (statusStr == "Completed")
-        e.state = Entry::State::Completed;
+        e->state = Entry::State::Completed;
     else
-        e.state = Entry::State::NotStarted;
+        e->state = Entry::State::NotStarted;
 
-    QModelIndex modelIndex = m_model.index(index);
-    m_model.dataChanged(modelIndex, modelIndex);
-
+    m_model.notifyEntryChanged(id);
 }
 
 void Controller::saveEntries(const QString &filename)
@@ -62,7 +62,7 @@ void Controller::saveEntries(const QString &filename)
         return;
 
     QTextStream out(&file);
-    out << "Name,Description,Deadline,Status\n";
+    out << "ID,Name,Description,Deadline,Status\n";
 
     const EntryVector &all = m_model.allEntries();
     for (const Entry &e : all) {
@@ -72,7 +72,8 @@ void Controller::saveEntries(const QString &filename)
         case Entry::State::InProgress: statusStr = "In progress"; break;
         case Entry::State::Completed:  statusStr = "Completed"; break;
         }
-        out << e.entryName << ","
+        out << e.id.toString(QUuid::WithoutBraces) << ","
+            << e.entryName << ","
             << e.description << ","
             << e.deadline.toString() << ","
             << statusStr << "\n";
@@ -89,32 +90,52 @@ void Controller::loadEntries(const QString &filename)
         return;
 
     QTextStream in(&file);
-    in.readLine(); // skip header
+    QString header = in.readLine();
+
+    // Check if this is an old format file (without ID column)
+    bool hasIdColumn = header.startsWith("ID,");
 
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList fields = line.split(',');
-        if (fields.size() != 4)
-            continue;
 
         Entry e;
-        e.entryName = fields[0];
-        e.description = fields[1];
-        e.deadline = QDateTime::fromString(fields[2]);
-        QString statusStr = fields[3];
 
-        if (statusStr == "In progress")
-            e.state = Entry::State::InProgress;
-        else if (statusStr == "Completed")
-            e.state = Entry::State::Completed;
-        else
-            e.state = Entry::State::NotStarted;
+        if (hasIdColumn && fields.size() >= 5) {
+            // New format with ID
+            e = Entry(QUuid::fromString(fields[0]));
+            e.entryName = fields[1];
+            e.description = fields[2];
+            e.deadline = QDateTime::fromString(fields[3]);
+            QString statusStr = fields[4];
+
+            if (statusStr == "In progress")
+                e.state = Entry::State::InProgress;
+            else if (statusStr == "Completed")
+                e.state = Entry::State::Completed;
+            else
+                e.state = Entry::State::NotStarted;
+        }
+        else if (!hasIdColumn && fields.size() >= 4) {
+            // Old format without ID - generate new ID
+            e.entryName = fields[0];
+            e.description = fields[1];
+            e.deadline = QDateTime::fromString(fields[2]);
+            QString statusStr = fields[3];
+
+            if (statusStr == "In progress")
+                e.state = Entry::State::InProgress;
+            else if (statusStr == "Completed")
+                e.state = Entry::State::Completed;
+            else
+                e.state = Entry::State::NotStarted;
+        }
+        else {
+            continue; // Skip malformed lines
+        }
 
         entries.push_back(e);
     }
 
-    m_model.setAllEntries(entries); // replace full list and rebuild filtered view
+    m_model.setAllEntries(entries);
 }
-
-
-

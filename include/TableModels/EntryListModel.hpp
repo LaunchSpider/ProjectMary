@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include <QtQml/qqmlregistration.h>
+#include <QUuid>
 #include "Entry.hpp"
 #include "EntryVector.hpp"
 
@@ -12,7 +13,8 @@ class EntryListModel : public QAbstractListModel
 
 public:
     enum Roles {
-        NameRole = Qt::UserRole + 1,
+        IdRole = Qt::UserRole + 1,
+        NameRole,
         DescriptionRole,
         DeadlineRole,
         StatusRole
@@ -35,6 +37,7 @@ public:
             return m;
 
         const Entry &e = m_entries[row];
+        m["id"] = e.id.toString(QUuid::WithoutBraces);
         m["name"] = e.entryName;
         m["description"] = e.description;
         m["deadline"] = e.deadline;
@@ -50,12 +53,14 @@ public:
         return m;
     }
 
-    Q_INVOKABLE void removeEntry(int index);
+    Q_INVOKABLE void removeEntryById(const QUuid &id);
 
     Q_INVOKABLE void setFilter(const QString &filterText);
 
     void addEntry(const Entry &entry);
-    Entry &entryAt(int row) { return m_entries[row]; }
+
+    Entry* findEntryById(const QUuid &id);
+    void notifyEntryChanged(const QUuid &id);
 
     const EntryVector& allEntries() const { return m_allEntries; }
     void setAllEntries(const EntryVector& entries) {
@@ -64,6 +69,8 @@ public:
     }
 
 private:
+    int findIndexById(const QUuid &id) const;
+
     EntryVector m_entries;
     bool m_sortAscending = true;
 

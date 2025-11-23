@@ -3,6 +3,7 @@
 
 #include <QDateTime>
 #include <QString>
+#include <QUuid>
 
 struct Entry
 {
@@ -12,8 +13,12 @@ struct Entry
         Completed
     };
 
-    Entry() = default;
+    Entry() : id(QUuid::createUuid()) {}
 
+    // Constructor that accepts an existing ID (for loading from file)
+    Entry(const QUuid &existingId) : id(existingId) {}
+
+    QUuid     id;
     QString   entryName;
     QString   description;
     QDateTime deadline;

@@ -22,6 +22,8 @@ QVariant EntryListModel::data(const QModelIndex &index, int role) const
     const Entry &e = m_entries.at(index.row());
 
     switch (role) {
+    case IdRole:
+        return e.id.toString(QUuid::WithoutBraces);
     case NameRole:
         return e.entryName;
     case DescriptionRole:
@@ -42,6 +44,7 @@ QVariant EntryListModel::data(const QModelIndex &index, int role) const
 QHash<int,QByteArray> EntryListModel::roleNames() const
 {
     QHash<int,QByteArray> roles;
+    roles[IdRole]          = "id";
     roles[NameRole]        = "name";
     roles[DescriptionRole] = "description";
     roles[DeadlineRole]    = "deadline";
@@ -104,12 +107,53 @@ void EntryListModel::sortBy(const QString &roleName)
     setFilter(m_filter);
 }
 
-void EntryListModel::removeEntry(int index) {
-    if (index < 0 || index >= m_allEntries.size())
-        return;
-    beginRemoveRows(QModelIndex(), index, index);
-    m_allEntries.erase(m_allEntries.begin() + index);
-    endRemoveRows();
+int EntryListModel::findIndexById(const QUuid &id) const
+{
+    for (int i = 0; i < m_allEntries.size(); ++i) {
+        if (m_allEntries[i].id == id)
+            return i;
+    }
+    return -1;
 }
 
+Entry* EntryListModel::findEntryById(const QUuid &id)
+{
+    for (Entry &e : m_allEntries) {
+        if (e.id == id)
+            return &e;
+    }
+    return nullptr;
+}
 
+void EntryListModel::notifyEntryChanged(const QUuid &id)
+{
+    // Find the entry in the filtered list
+    for (int i = 0; i < m_entries.size(); ++i) {
+        if (m_entries[i].id == id) {
+            // Also update in m_allEntries
+            for (Entry &e : m_allEntries) {
+                if (e.id == id) {
+                    m_entries[i] = e;
+                    break;
+                }
+            }
+
+            QModelIndex modelIndex = index(i);
+            emit dataChanged(modelIndex, modelIndex);
+            return;
+        }
+    }
+}
+
+void EntryListModel::removeEntryById(const QUuid &id)
+{
+    int idx = findIndexById(id);
+    if (idx < 0)
+        return;
+
+    // Remove from m_allEntries
+    m_allEntries.erase(m_allEntries.begin() + idx);
+
+    // Rebuild filtered list
+    setFilter(m_filter);
+}

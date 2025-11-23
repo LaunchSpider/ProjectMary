@@ -7,11 +7,14 @@ ListView {
     currentIndex: -1
     clip: true
 
+    property string selectedEntryId: ""
+
     delegate: Rectangle {
         id: delegateRoot
         width: ListView.view.width
         height: 40
 
+        property string d_id: id
         property string d_name: name
         property string d_description: description
         property string d_deadline: deadline
@@ -19,7 +22,10 @@ ListView {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.currentIndex = model.index
+            onClicked: {
+                root.currentIndex = model.index
+                root.selectedEntryId = id
+            }
         }
 
         RowLayout {
@@ -35,10 +41,10 @@ ListView {
             Text {
                 text: {
                     const now = new Date();
-                    const d = new Date(deadline); // ensure new Date() copy
+                    const d = new Date(deadline);
 
                     let diffMs = d.getTime() - now.getTime();
-                    if (diffMs <= 1000) // allow 1 second tolerance
+                    if (diffMs <= 1000)
                         return "Expired";
 
                     const minute = 60000;

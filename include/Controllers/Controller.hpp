@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QtQml>
 #include <QQmlEngine>
+#include <QUuid>
 #include "EntryListModel.hpp"
 #include "Entry.hpp"
 
@@ -31,18 +32,20 @@ public:
                               const QDateTime &deadline,
                               const QString &statusStr);
 
-    Q_INVOKABLE void updateEntry(int index,
-                                 const QString &name,
-                                 const QString &description,
-                                 const QDateTime &deadline,
-                                 const QString &statusStr);
+    Q_INVOKABLE void updateEntryById(const QString &idStr,
+                                     const QString &name,
+                                     const QString &description,
+                                     const QDateTime &deadline,
+                                     const QString &statusStr);
 
     Q_INVOKABLE void saveEntries(const QString &filename);
     Q_INVOKABLE void loadEntries(const QString &filename);
 
     Q_INVOKABLE void sortBy(const QString &roleName) { m_model.sortBy(roleName); }
 
-    Q_INVOKABLE void removeEntry(int index) { m_model.removeEntry(index); }
+    Q_INVOKABLE void removeEntryById(const QString &idStr) {
+        m_model.removeEntryById(QUuid::fromString(idStr));
+    }
 
     Q_INVOKABLE void setSearchFilter(const QString &text) {
         m_model.setFilter(text);
